@@ -1,3 +1,7 @@
+let messageType = document.getElementById('message-type');
+let customMessage = document.getElementById('custom-message');
+let customMessageHelp = document.getElementById('custom-message-help');
+
 document.getElementById('message-template').addEventListener('change', function() {
     const customMessageInput = document.getElementById('custom-message');
     const companyInputs = document.getElementsByClassName('company');
@@ -5,16 +9,12 @@ document.getElementById('message-template').addEventListener('change', function(
 
     if (this.value === 'custom') {
         customMessageInput.style.display = 'block';
+        customMessage.style.display = 'block';
+        customMessageHelp.style.display = 'block';
     } else {
         customMessageInput.style.display = 'none';
-    }
-    
-    if (this.value === 'open-chat') {
-        Array.from(companyInputs).forEach(input => input.style.display = 'none');
-        Array.from(nameInputs).forEach(input => input.style.display = 'none');
-    } else {
-        Array.from(companyInputs).forEach(input => input.style.display = 'block');
-        Array.from(nameInputs).forEach(input => input.style.display = 'block');
+        customMessage.style.display = 'none';
+        customMessageHelp.style.display = 'none';
     }
 });
 
@@ -22,9 +22,9 @@ function addInput() {
     const inputGroup = document.createElement('div');
     inputGroup.className = 'inputGroup';
     inputGroup.innerHTML = `
-        <input class="name" type="text" placeholder="Nombre">
-        <input class="phone" type="text" placeholder="Teléfono" required>
-        <input class="company" type="text" placeholder="Empresa">
+        <input class="name" type="text" placeholder="Nombre (opcional)">
+        <input class="phone" type="text" placeholder="Teléfono (requerido)" required>
+        <input class="company" type="text" placeholder="Empresa (opcional)">
     `;
     document.getElementById('inputContainer').appendChild(inputGroup);
 }
@@ -57,7 +57,7 @@ function generateLinks() {
 
         let message;
         if (messageTemplate === 'account-activated') {
-            message = `${greeting}, somos del equipo de soporte de Monto, queremos informarte que tu cuenta esta activada.`;
+            message = `${greeting}, somos del equipo de soporte de Monto, queremos informarte que tu cuenta se activo correctamente.`;
         } else if (messageTemplate === 'card-invalid') {
             message = `${greeting}. Te contactamos de soporte de Monto. Prestación de ${company}, tenemos un problema para validar tu cuenta. Para que puedas disfrutar de todos los beneficios que te ofrecemos como el adelanto de tus días ya trabajados. Sólo envíanos por aquí tu número de cuenta CLABE (18 dígitos) que tengas con algún banco tradicional como HSBC, SCOTIABANK, BANAMEX, BANCOMER etc que esté a tu nombre, el nombre del banco y una foto de tu INE para validar tu identidad y realizar los cambios.`;
         } else if (messageTemplate === 'support-help') {

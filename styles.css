@@ -1,18 +1,48 @@
-body {
-    font-family: Arial, sans-serif;
+
+
+body{
+    background: #E9ECF4;
+    color: #000;
+    font-family: 'Roboto', sans-serif;
     padding: 20px;
-    background-color: #f6f6f6;
+}
+
+.contenedor{
+    width: 90%;
+    max-width: 700px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.options{
+    display: flex;
+}
+
+.custom-msg{
+    min-height: 100px;
+    max-width: 700px;
+}
+
+.margin-pading{
+    margin: 10px;
 }
 
 h1 {
     color: #333;
 }
 
+.p-title{
+ display: flex;
+ justify-content: space-around;
+}
+
 #inputContainer .inputGroup {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 10px;
+    margin-top: 20px;
 }
 
 #inputContainer .inputGroup input {
