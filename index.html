@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CustomWA</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <h1>CustomWA</h1>
+    
+    <div id="inputContainer">
+        <div class="inputGroup">
+            <input class="name" type="text" placeholder="Nombre">
+            <input class="phone" type="text" placeholder="Teléfono" required>
+            <input class="company" type="text" placeholder="Empresa">
+        </div>
+    </div>
+    
+    <button id="addInput" onclick="addInput()">+</button>
+    <button id="removeInput" onclick="removeInput()">-</button>
+
+    <select id="message-template">
+        <option value="account-activated">Cuenta activada</option>
+        <option value="card-invalid">Tarjeta inválida</option>
+        <option value="support-help">Ayuda de soporte</option>
+        <option value="open-chat">Abrir chat</option>
+        <option value="custom">Personalizado</option>
+    </select>
+
+    <textarea id="custom-message" style="display: none;" placeholder="Escribe tu mensaje personalizado aquí."></textarea>
+
+    <select id="platform-template">
+        <option value="web">Web</option>
+        <option value="app">Aplicación</option>
+    </select>
+
+    <button id="generate" onclick="generateLinks()">Generar enlaces</button>
+
+    <div id="output"></div>
+
+    <script src="main.js"></script>
+</body>
+</html>

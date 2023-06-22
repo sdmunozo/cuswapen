@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f6f6f6;
+}
+
+h1 {
+    color: #333;
+}
+
+#inputContainer .inputGroup {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#inputContainer .inputGroup input {
+    width: 30%;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
+
+#inputContainer .inputGroup input:last-child {
+    margin-right: 0;
+}
+
+button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+#addInput {
+    background-color: #add8e6;
+}
+
+#removeInput {
+    background-color: #f08080;
+}
+
+#generate {
+    background-color: #98FB98;
+}
+
+select, textarea {
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin: 10px 0;
+}
+
+#output {
+    margin-top: 20px;
+}
+
+#output a {
+    display: block;
+    margin-bottom: 10px;
+}
