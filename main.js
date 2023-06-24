@@ -1,4 +1,4 @@
-let messageType = document.getElementById('message-type');
+let messageType = document.getElementById('message-template');
 let customMessage = document.getElementById('custom-message');
 let customMessageHelp = document.getElementById('custom-message-help');
 
@@ -18,40 +18,113 @@ document.getElementById('message-template').addEventListener('change', function(
     }
 });
 
-function addInput() {
+document.getElementById('generate').addEventListener('click', function() {
+    const inputGroups = Array.from(document.getElementsByClassName('inputGroup')).map(inputGroup => ({
+        name: inputGroup.getElementsByClassName('name')[0].value,
+        phone: inputGroup.getElementsByClassName('phone')[0].value,
+        company: inputGroup.getElementsByClassName('company')[0].value,
+        status: 'Pendiente',
+        link: ''
+    }));
+    saveDataToLocalStorage(inputGroups);
+    generateLinks(inputGroups);
+});
+
+document.getElementById('csvImport').addEventListener('change', function(evt) {
+    clearInputs();
+    let file = evt.target.files[0];
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let contents = e.target.result;
+        let lines = contents.split('\n');
+        let inputGroups = [];
+        for (let i = 1; i < lines.length; i++) {
+            let cells = lines[i].split(',');
+            if (cells.length === 3) {
+                let inputGroup = {
+                    name: cells[0],
+                    phone: cells[1],
+                    company: cells[2],
+                    status: 'Pendiente',
+                    link: ''
+                };
+                inputGroups.push(inputGroup);
+            }
+        }
+        clearInputs();
+        inputGroups.forEach(inputGroup => {
+            addInputWithValue(inputGroup.name, inputGroup.phone, inputGroup.company);
+        });
+        saveDataToLocalStorage(inputGroups);
+        //generateLinks(inputGroups);
+    };
+    reader.readAsText(file);
+});
+
+document.getElementById('csvExport').addEventListener('click', function() {
+    let links = document.getElementsByClassName('whatsapp-link');
+    let csvContent = "data:text/csv;charset=utf-8," + "Name,Phone,Company,Link\n";
+    for (let i = 0; i < links.length; i++) {
+        let link = links[i];
+        let csvRow = `${link.getAttribute('data-name')},${link.getAttribute('data-phone')},${link.getAttribute('data-company')},${link.href}\n`;
+        csvContent += csvRow;
+    }
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "export.csv");
+    document.body.appendChild(link);
+    link.click();
+});
+
+function addInput(inputGroup) {
+    const inputContainer = document.createElement('div');
+    inputContainer.className = 'inputGroup';
+    inputContainer.innerHTML = `
+        <input class="name" type="text" placeholder="Nombre (opcional)" value="${inputGroup ? inputGroup.name : ''}">
+        <input class="phone" type="text" placeholder="Teléfono (requerido)" required value="${inputGroup ? inputGroup.phone : ''}">
+        <input class="company" type="text" placeholder="Empresa (opcional)" value="${inputGroup ? inputGroup.company : ''}">
+    `;
+    document.getElementById('inputContainer').appendChild(inputContainer);
+}
+
+function clearInputs() {
+    const inputContainer = document.getElementById('inputContainer');
+    while (inputContainer.firstChild) {
+        inputContainer.removeChild(inputContainer.firstChild);
+    }
+}
+
+function addInputWithValue(name, phone, company) {
     const inputGroup = document.createElement('div');
     inputGroup.className = 'inputGroup';
     inputGroup.innerHTML = `
-        <input class="name" type="text" placeholder="Nombre (opcional)">
-        <input class="phone" type="text" placeholder="Teléfono (requerido)" required>
-        <input class="company" type="text" placeholder="Empresa (opcional)">
+        <input class="name" type="text" placeholder="Nombre (opcional)" value="${name}">
+        <input class="phone" type="text" placeholder="Teléfono (requerido)" value="${phone}" required>
+        <input class="company" type="text" placeholder="Empresa (opcional)" value="${company}">
     `;
     document.getElementById('inputContainer').appendChild(inputGroup);
 }
 
-function removeInput() {
-    const inputContainer = document.getElementById('inputContainer');
-    const inputGroups = inputContainer.getElementsByClassName('inputGroup');
-    if (inputGroups.length > 1) {
-        inputContainer.removeChild(inputGroups[inputGroups.length - 1]);
-    }
-}
-
-function generateLinks() {
-    const inputGroups = document.getElementsByClassName('inputGroup');
+function generateLinks(inputGroups) {
     const messageTemplate = document.getElementById('message-template').value;
     const platformTemplate = document.getElementById('platform-template').value;
     const customMessage = document.getElementById('custom-message').value;
     const outputDiv = document.getElementById('output');
 
     const urlTemplate = platformTemplate === 'web' ? 'https://web.whatsapp.com/send?' : 'https://api.whatsapp.com/send?';
+
+    let pendingOutputDiv = document.createElement('div');
+    let sentOutputDiv = document.createElement('div');
+    let divider = document.createElement('hr');
+
     outputDiv.innerHTML = '';
 
     for (const inputGroup of inputGroups) {
-        const name = inputGroup.getElementsByClassName('name')[0].value || '';
-        const phoneNumber = inputGroup.getElementsByClassName('phone')[0].value;
+        const name = inputGroup.name || '';
+        const phoneNumber = inputGroup.phone;
         if (!phoneNumber) continue; // Skip if no phone number is provided
-        const company = inputGroup.getElementsByClassName('company')[0].value || 'tu empresa';
+        const company = inputGroup.company || 'tu empresa';
 
         const greeting = name ? `Hola ${name}` : 'Hola';
 
@@ -68,13 +141,62 @@ function generateLinks() {
 
         const messageUrl = message ? encodeURIComponent(message) : '';
         const link = `${urlTemplate}phone=521${phoneNumber}` + (message ? `&text=${messageUrl}` : '');
-        
+
+        const messageDiv = document.createElement('div');
+        messageDiv.style.display = 'flex';
+        messageDiv.style.justifyContent = 'space-between';
+        messageDiv.style.alignItems = 'center';
+
         const linkElement = document.createElement('a');
         linkElement.href = link;
         linkElement.target = '_blank';
-        linkElement.textContent = `Mensaje para ${name || 'Desconocido'}`;
-        linkElement.className = 'whatsapp-link';
-        
-        outputDiv.appendChild(linkElement);
+        linkElement.textContent = `Mensaje para ${name || 'Desconocido'} - ${phoneNumber} - ${company}`;
+        linkElement.className = 'whatsapp-link btn';
+        linkElement.setAttribute('data-name', name);
+        linkElement.setAttribute('data-phone', phoneNumber);
+        linkElement.setAttribute('data-company', company);
+        linkElement.onclick = function() {
+            inputGroup.status = 'Enviado';
+            saveDataToLocalStorage(inputGroups);
+            regenerateLinks(inputGroups);
+        }
+
+        const statusElement = document.createElement('span');
+        statusElement.textContent = inputGroup.status || 'Pendiente';
+
+        messageDiv.appendChild(linkElement);
+        messageDiv.appendChild(statusElement);
+
+        if(inputGroup.status === 'Enviado') {
+            sentOutputDiv.insertBefore(messageDiv, sentOutputDiv.firstChild);
+        } else {
+            pendingOutputDiv.appendChild(messageDiv);
+        }
     }
+
+    outputDiv.appendChild(pendingOutputDiv);
+    outputDiv.appendChild(divider);
+    outputDiv.appendChild(sentOutputDiv);
+
+    saveDataToLocalStorage(inputGroups);
+}
+
+function regenerateLinks(inputGroups) {
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = '';
+    generateLinks(inputGroups);
+}
+
+
+function saveDataToLocalStorage(data) {
+    localStorage.setItem('inputGroups', JSON.stringify(data));
+}
+
+function loadDataFromLocalStorage() {
+    return JSON.parse(localStorage.getItem('inputGroups')) || [];
+}
+
+window.onload = function() {
+    const inputGroups = loadDataFromLocalStorage();
+    generateLinks(inputGroups);
 }
