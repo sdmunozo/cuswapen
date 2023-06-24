@@ -18,6 +18,18 @@ document.getElementById('message-template').addEventListener('change', function(
     }
 });
 
+document.getElementById('csvTemplate').addEventListener('click', function() {
+    const csvContent = "Name,Phone,Company\n";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", "data:text/csv;charset=utf-8," + encodedUri);
+    link.setAttribute("download", "template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+  
+
 document.getElementById('generate').addEventListener('click', function() {
     const inputGroups = Array.from(document.getElementsByClassName('inputGroup')).map(inputGroup => ({
         name: inputGroup.getElementsByClassName('name')[0].value,
